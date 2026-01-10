@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+.next/
+out/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env*
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# AWS
+.aws/credentials
+
+# Database
+*.db
+*.sqlite
+
+# Build
+dist/
+build/
+*.pyc
+
+# Rust/Odra
+target/
+staking-tracker/wasm/
+Cargo.lock

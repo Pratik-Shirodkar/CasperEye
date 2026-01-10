@@ -1,0 +1,24 @@
+name: satoshis-eye
+services:
+- name: api
+  source_dir: /backend
+  github:
+    repo: your-username/SatoshisEye
+    branch: main
+  run_command: python simple_main.py
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  
+- name: frontend
+  source_dir: /frontend
+  github:
+    repo: your-username/SatoshisEye
+    branch: main
+  build_command: npm install && npm run build
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  routes:
+  - path: /

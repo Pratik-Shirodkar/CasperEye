@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Graph Database
+  gremlin-server:
+    image: tinkerpop/gremlin-server:3.6.0
+    container_name: satoshis-eye-graph
+    ports:
+      - "8182:8182"
+    volumes:
+      - gremlin-data:/var/lib/gremlin
+
+  # Backend API
+  api:
+    build: ./backend
+    container_name: satoshis-eye-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - gremlin-server
+    environment:
+      - GREMLIN_ENDPOINT=ws://gremlin-server:8182/gremlin
+
+  # Ingestion Worker
+  ingester:
+    build: ./backend
+    container_name: satoshis-eye-ingester
+    command: python ingest_live.py
+    depends_on:
+      - gremlin-server
+    environment:
+      - GREMLIN_ENDPOINT=ws://gremlin-server:8182/gremlin
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    container_name: satoshis-eye-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  gremlin-data:
+    driver: local

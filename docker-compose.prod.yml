@@ -1,0 +1,122 @@
+services:
+  # Graph Database
+  gremlin-server:
+    image: tinkerpop/gremlin-server:3.5.4
+    container_name: satoshis-eye-graph
+    ports:
+      - "8182:8182"
+    restart: always
+    environment:
+      - GREMLIN_POOL_SIZE=8
+    # Use default entrypoint and command from the image
+    # No healthcheck needed - API has retry logic to wait for Gremlin
+
+  # Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: satoshis-eye-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - gremlin-server
+    environment:
+      - GREMLIN_ENDPOINT=ws://gremlin-server:8182/gremlin
+      - JWT_SECRET=${JWT_SECRET}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
+    restart: always
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Ingestion Worker
+  ingester:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: satoshis-eye-ingester
+    command: python ingest_live.py
+    depends_on:
+      - gremlin-server
+    environment:
+      - GREMLIN_ENDPOINT=ws://gremlin-server:8182/gremlin
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: satoshis-eye-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      - NEXT_PUBLIC_API_URL=/api
+      - NODE_ENV=production
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: satoshis-eye-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      frontend:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  nginx-cache:
+    driver: local
+
+networks:
+  default:
+    name: satoshis-eye-network
+    driver: bridge

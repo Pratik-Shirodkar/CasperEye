@@ -1,0 +1,78 @@
+name: Deploy StakingTracker to Casper Testnet
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'staking-tracker/**'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to testnet'
+        required: true
+        default: 'false'
+        type: boolean
+
+env:
+  RUST_TOOLCHAIN: nightly-2024-01-01
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Rust
+      uses: dtolnay/rust-action@stable
+      with:
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
+        targets: wasm32-unknown-unknown
+    
+    - name: Install cargo-odra
+      run: cargo install cargo-odra
+    
+    - name: Build Contract
+      working-directory: staking-tracker
+      run: cargo odra build
+    
+    - name: Run Tests
+      working-directory: staking-tracker
+      run: cargo odra test
+    
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: staking-tracker-wasm
+        path: staking-tracker/wasm/*.wasm
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event.inputs.deploy == 'true'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: staking-tracker-wasm
+        path: staking-tracker/wasm
+    
+    - name: Install Rust
+      uses: dtolnay/rust-action@stable
+      with:
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
+    
+    - name: Install cargo-odra
+      run: cargo install cargo-odra
+    
+    - name: Deploy to Casper Testnet
+      working-directory: staking-tracker
+      env:
+        CASPER_SECRET_KEY: ${{ secrets.CASPER_SECRET_KEY }}
+      run: |
+        echo "Deploying StakingTracker to Casper Testnet..."
+        # cargo odra deploy -b casper-testnet
+        echo "⚠️ Manual deployment required - add CASPER_SECRET_KEY secret"

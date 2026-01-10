@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # 1. The Graph Database (Simulates Amazon Neptune)
+  neptune-local:
+    image: tinkerpop/gremlin-server:3.7
+    container_name: satoshis_neptune
+    ports:
+      - "8182:8182"
+    networks:
+      - babylon-net
+
+  # 2. (Optional) A Visualizer to browse raw data
+  gremlin-visualizer:
+    image: prabushitha/gremlin-visualizer:latest
+    container_name: satoshis_visualizer
+    ports:
+      - "3001:3000"
+    environment:
+      - GREMLIN_HOST=neptune-local
+      - GREMLIN_PORT=8182
+    networks:
+      - babylon-net
+
+networks:
+  babylon-net:
