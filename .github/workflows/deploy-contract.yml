@@ -34,11 +34,11 @@ jobs:
     
     - name: Build Contract
       working-directory: staking-tracker
-      run: cargo odra build
+      run: cargo +${{ env.RUST_TOOLCHAIN }} odra build
     
     - name: Run Tests
       working-directory: staking-tracker
-      run: cargo odra test
+      run: cargo +${{ env.RUST_TOOLCHAIN }} odra test
     
     - name: Upload WASM artifacts
       uses: actions/upload-artifact@v4
@@ -75,4 +75,4 @@ jobs:
         CASPER_SECRET_KEY: ${{ secrets.CASPER_SECRET_KEY }}
       run: |
         echo "Deploying StakingTracker to Casper Testnet..."
-        cargo odra deploy -b casper-testnet
+        cargo +${{ env.RUST_TOOLCHAIN }} odra deploy -b casper-testnet
