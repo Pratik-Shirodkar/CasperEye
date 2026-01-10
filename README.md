@@ -12,12 +12,15 @@
 
 ## 🎯 Project Overview
 
-CasperEye is a **staking intelligence platform** for Casper Network that provides:
+CasperEye is a **staking intelligence platform** for Casper Network that![CasperEye Dashboard](https://raw.githubusercontent.com/Pratik-Shirodkar/CasperEye/main/.gemini/antigravity/brain/a5daf151-ccc3-47c6-905f-bf030c8ab11b/caspereye_live_data_tab_1768035928970.png)
 
-- **Real-time Validator Monitoring** - Track 100+ Casper validators with live stake data
-- **Whale Detection** - Identify large delegators (>100K CSPR) and track their movements
-- **AI-Powered Analysis** - AWS Bedrock Claude integration for intelligent staking insights
-- **Risk Scoring** - Analyze concentration risks and validator health
+## 🚀 Features
+
+*   **Live Validator Metrics**: Real-time tracking of stake, delegation rates, and performance from CSPR.cloud.
+*   **Whale Alerts**: Automatic detection of large CSPR movements (>100k CSPR) using graph analysis.
+*   **AI Staking Assistant**: Natural language queries about the network powered by AWS Bedrock.
+*   **Risk Analysis**: Graph-based visualization of validator centralization and risks.
+*   **Liquid Staking Ready**: Infrastructure prepared for future LSD protocols on Casper.lidator health
 - **Interactive Graph Visualization** - Force-directed network showing staking relationships
 - **On-chain Analytics Contract** - Odra-based StakingTracker for recording snapshots
 
