@@ -74,5 +74,4 @@ jobs:
         CASPER_SECRET_KEY: ${{ secrets.CASPER_SECRET_KEY }}
       run: |
         echo "Deploying StakingTracker to Casper Testnet..."
-        # cargo odra deploy -b casper-testnet
-        echo "⚠️ Manual deployment required - add CASPER_SECRET_KEY secret"
+        cargo odra deploy -b casper-testnet
