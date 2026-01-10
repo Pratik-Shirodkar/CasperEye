@@ -31,6 +31,9 @@ jobs:
     
     - name: Install cargo-odra
       run: cargo install cargo-odra
+      
+    - name: Add WASM target
+      run: rustup target add wasm32-unknown-unknown --toolchain ${{ env.RUST_TOOLCHAIN }}
     
     - name: Build Contract
       working-directory: staking-tracker
@@ -67,6 +70,9 @@ jobs:
     
     - name: Install cargo-odra
       run: cargo install cargo-odra
+
+    - name: Add WASM target
+      run: rustup target add wasm32-unknown-unknown --toolchain ${{ env.RUST_TOOLCHAIN }}
     
     - name: Deploy to Casper Testnet
       working-directory: staking-tracker
