@@ -14,7 +14,7 @@ on:
         type: boolean
 
 env:
-  RUST_TOOLCHAIN: nightly
+  RUST_TOOLCHAIN: nightly-2024-08-01
 
 jobs:
   build:
