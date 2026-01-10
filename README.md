@@ -1,4 +1,5 @@
 # 🔍 CasperEye - CSPR Staking Intelligence Platform
+[![Deploy StakingTracker](https://github.com/Pratik-Shirodkar/CasperEye/actions/workflows/deploy-contract.yml/badge.svg)](https://github.com/Pratik-Shirodkar/CasperEye/actions/workflows/deploy-contract.yml)
 
 > Real-time staking analytics for Casper Network using graph-based analytics and AI.
 
