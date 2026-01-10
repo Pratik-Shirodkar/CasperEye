@@ -10,7 +10,7 @@ on:
       deploy:
         description: 'Deploy to testnet'
         required: true
-        default: 'false'
+        default: false
         type: boolean
 
 env:
@@ -26,7 +26,7 @@ jobs:
     - name: Install Rust
       uses: dtolnay/rust-toolchain@nightly
       with:
-        toolchain: nightly-2024-01-01
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
         targets: wasm32-unknown-unknown
     
     - name: Install cargo-odra
@@ -63,7 +63,7 @@ jobs:
     - name: Install Rust
       uses: dtolnay/rust-toolchain@nightly
       with:
-        toolchain: nightly-2024-01-01
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
     
     - name: Install cargo-odra
       run: cargo install cargo-odra
