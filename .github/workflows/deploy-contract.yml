@@ -14,7 +14,7 @@ on:
         type: boolean
 
 env:
-  # Project compilation toolchain
+  # Project compilation toolchain - Goldilocks version
   RUST_TOOLCHAIN: nightly-2024-12-25
 
 jobs:
@@ -23,7 +23,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-
+    
+    # 1. Install System Dependencies
     - name: Install binaryen (wasm-opt) and wabt (wasm-strip)
       run: |
         sudo apt-get update && sudo apt-get install -y wabt
@@ -31,18 +32,18 @@ jobs:
         tar -xzf binaryen-version_116-x86_64-linux.tar.gz
         echo "$(pwd)/binaryen-version_116/bin" >> $GITHUB_PATH
     
-    # 1. Setup Stable for installing tools (cargo-odra)
-    - name: Setup Stable Rust
+    # 2. Setup Stable (for tools) and Pinned Nightly (for build)
+    - name: Setup Rust Toolchains
       run: |
         rustup toolchain install stable
         rustup toolchain install ${{ env.RUST_TOOLCHAIN }}
         rustup target add wasm32-unknown-unknown --toolchain ${{ env.RUST_TOOLCHAIN }}
     
-    # 2. Install cargo-odra using STABLE (avoids nightly dep issues)
-    - name: Install cargo-odra
-      run: cargo +stable install cargo-odra
+    # 3. Install odra-cli (Use stable to avoid nightly 'edition2024' dep issues in the tool itself)
+    - name: Install odra-cli
+      run: cargo +stable install odra-cli
     
-    # 3. Build project using NIGHTLY (required by Odra framework)
+    # 4. Build project using NIGHTLY (required by Odra framework)
     - name: Build Contract
       working-directory: staking-tracker
       run: cargo +${{ env.RUST_TOOLCHAIN }} odra build
@@ -65,21 +66,33 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    # 1. Download Artifacts
     - name: Download WASM artifacts
       uses: actions/download-artifact@v4
       with:
         name: staking-tracker-wasm
         path: staking-tracker/wasm
     
-    - name: Setup Rust Manually
+    # 2. System Dependencies
+    - name: Install binaryen (wasm-opt) and wabt (wasm-strip)
+      run: |
+        sudo apt-get update && sudo apt-get install -y wabt
+        wget https://github.com/WebAssembly/binaryen/releases/download/version_116/binaryen-version_116-x86_64-linux.tar.gz
+        tar -xzf binaryen-version_116-x86_64-linux.tar.gz
+        echo "$(pwd)/binaryen-version_116/bin" >> $GITHUB_PATH
+    
+    # 3. Setup Rust
+    - name: Setup Rust Toolchains
       run: |
         rustup toolchain install stable
         rustup toolchain install ${{ env.RUST_TOOLCHAIN }}
         rustup target add wasm32-unknown-unknown --toolchain ${{ env.RUST_TOOLCHAIN }}
     
-    - name: Install cargo-odra
-      run: cargo +stable install cargo-odra
+    # 4. Install odra-cli
+    - name: Install odra-cli
+      run: cargo +stable install odra-cli
     
+    # 5. Deploy
     - name: Deploy to Casper Testnet
       working-directory: staking-tracker
       env:
