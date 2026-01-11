@@ -39,9 +39,9 @@ jobs:
         rustup toolchain install ${{ env.RUST_TOOLCHAIN }}
         rustup target add wasm32-unknown-unknown --toolchain ${{ env.RUST_TOOLCHAIN }}
     
-    # 3. Install odra-cli (Use stable to avoid nightly 'edition2024' dep issues in the tool itself)
-    - name: Install odra-cli
-      run: cargo +stable install odra-cli
+    # 3. Install cargo-odra from GIT (Crates.io version is outdated)
+    - name: Install cargo-odra
+      run: cargo +stable install --git https://github.com/odradev/odra cargo-odra
     
     # 4. Build project using NIGHTLY (required by Odra framework)
     - name: Build Contract
@@ -88,9 +88,9 @@ jobs:
         rustup toolchain install ${{ env.RUST_TOOLCHAIN }}
         rustup target add wasm32-unknown-unknown --toolchain ${{ env.RUST_TOOLCHAIN }}
     
-    # 4. Install odra-cli
-    - name: Install odra-cli
-      run: cargo +stable install odra-cli
+    # 4. Install cargo-odra from GIT
+    - name: Install cargo-odra
+      run: cargo +stable install --git https://github.com/odradev/odra cargo-odra
     
     # 5. Deploy
     - name: Deploy to Casper Testnet
