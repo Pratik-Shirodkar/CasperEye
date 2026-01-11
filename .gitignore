@@ -43,4 +43,3 @@ build/
 # Rust/Odra
 target/
 staking-tracker/wasm/
-Cargo.lock
